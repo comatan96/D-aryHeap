@@ -15,7 +15,7 @@ Use the static method `build_with_file()`.
 
 Usage:
   ```python
-  DHeap.build_with_file(str)  # str is path to file
+  list_of_dheaps = DHeap.build_with_file(str)  # str is path to file
   ```
 
 format the file:
