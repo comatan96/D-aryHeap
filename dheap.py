@@ -44,11 +44,14 @@ class DHeap:
             dheap_list = []
             with open(path) as f:
                 for line in f:
-                    line = line.split(' ')
-                    nums = line[0].split(',')
-                    d = int(line[1])
-                    h = [int(x) for x in nums]
-                    dheap_list.append((h, d))
+                    try:
+                        line = line.split(' ')
+                        nums = line[0].split(',')
+                        d = int(line[1])
+                        h = [int(x) for x in nums]
+                        dheap_list.append((h, d))
+                    except ValueError:
+                        print(f'Sorry, wrong input in: {line}, Please check input.')
             return dheap_list
 
         returnvalue = []
