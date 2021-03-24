@@ -1,33 +1,22 @@
 import math
-''' mmn 13 2020a Ds & Algo '''
-''' Matan Cohen , ID: 205907371 '''
-''' d-Heap implementation '''
-
-
 class DHeap:
     ''' creates d-heap
         heap: A python's list
         inp: inpus source as str, will include path to .txt file
         txt file should contain a list and d '''
-
-    def __init__(self, heap: list, d: int=None):
-        if type(heap) is list:
+    MINIMUM_D_VALUE = 2
+    def __init__(self, heap: list, d: int):
+        if isinstance(heap, list):
             self.__heap = heap
         else:
             raise TypeError("Argument heap is not a list!")
-        if not d:
-            try:
-                self.__d = int(input('Please insert d: '))
-            except ValueError:
-                print("Not a valid integer")
+        if isinstance(d, int):
+            self.__d = d
         else:
-            if type(d) is int:
-                self.__d = d
-            else:
-                raise TypeError("Given d is not an integer!")
-        if self.__d < 2:
+            raise TypeError("Given d is not an integer!")
+        if self.__d < self.MINIMUM_D_VALUE:
             raise ValueError("d must be greater than 2!")
-        self.build_d_heap(self.d)
+        self.build_d_heap()
 
     ''' Build d-heaps using a file, a static method
         the building is iterating through every line in the file
@@ -73,19 +62,18 @@ class DHeap:
         k >= 0 and k <= d-1
         child function as described on the paper (PDF)
         Constant time Complexity '''
-    def _child(self, k: int, i: int) -> int:
-        return self.d*i+1+k
+    def _child(self, child_index: int, parent_index: int) -> int:
+        return self.d * parent_index + 1 + child_index
 
-    def _parent(self, i: int) -> int:
-        return math.ceil(i/self.d)-1
+    def _parent(self, index: int) -> int:
+        return math.ceil(index / self.d) - 1
 
-    def build_d_heap(self, d):
+    def build_d_heap(self):
         ''' i is exactly as the regular binary heap 
-            this time instaed of using LENGTH/2 I used LENGHT/d 
-            // is floor division in Python '''
-        i = (len(self)-1)//d
-        for i in range(i, -1, -1):  # O(n/d)
-            self.dheap_max_heapify(i)
+            this time instaed of using LENGTH/2 I used LENGHT/d '''
+        childs_count = (len(self) - 1) // self.d
+        for child_index in range(childs_count, -1, -1):
+            self.dheap_max_heapify(child_index)
 
     ''' The implementation of dheap_max_heapify is pretty
         similar to the original heapify implementation.
@@ -93,15 +81,13 @@ class DHeap:
         "subtree" in order to make changes!
         The Time Complexity of this heapify is: O(d log d (n)). '''
     def dheap_max_heapify(self, i: int):
-        largest = i  # O(1)
-        for k in range(0, self.d):  # O(d)
-            # O(1)
+        largest = i
+        for k in range(0, self.d):
             if self._child(k, i) < len(self) and self.__heap[self._child(k, i)] > self.__heap[i]:
-                if self.__heap[self._child(k, i)] > self.__heap[largest]:  # O(1)
-                    largest = self._child(k, i)  # O(1)
+                if self.__heap[self._child(k, i)] > self.__heap[largest]:
+                    largest = self._child(k, i)
 
-        if largest != i:  # O(1)
-            # O(1) - swapping
+        if largest != i:
             self.__heap[i], self.__heap[largest] = self.__heap[largest], self.__heap[i]
             ''' This recursive call is happening at most Tree-Height times '''
             ''' A proof for Tree-Heigh on the paper (PDF) '''
@@ -124,10 +110,10 @@ class DHeap:
 
     def dheap_insert(self, key: int):
         ''' check if key is valid '''
-        if type(key) is int:  # O(1)
-            self.__heap.append(key)  # O(1) - adding key to the end of heap.
-            i = len(self)-1  # O(1)
-            self.dheap_upwords_heapify(i)  # fixing the heap.
+        if type(key) is int:
+            self.__heap.append(key)
+            i = len(self)-1
+            self.dheap_upwords_heapify(i)
 
     def dheap_increase_key(self, i: int, key: int):
         ''' check for error chances '''
@@ -135,7 +121,7 @@ class DHeap:
             raise IndexError("Index out of range")
         if type(key) is not int or key < self.__heap[i]:
             raise ValueError("Error, Invalid key")
-        self.__heap[i] = key  # set heap[i] as new key
+        self.__heap[i] = key
         ''' call method to fix heap '''
         self.dheap_upwords_heapify(i)
 
@@ -147,7 +133,6 @@ class DHeap:
         from this i and upwords (unlike heapify who goes downwords).
         Time complexity: O(log d (n)) bounded by the tree-height. '''
     def dheap_upwords_heapify(self, i: int):
-        # O(log d (n))
         while i > 0 and self.__heap[self._parent(i)] < self.__heap[i]:
             self.__heap[i], self.__heap[self._parent(i)] = self.__heap[self._parent(i)], self.__heap[i]
             i = self._parent(i)
